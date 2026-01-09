@@ -46,7 +46,7 @@ onSnapshot(collection(db,'tawaran'),snap=>{
 });
 
 window.aksi=async(id,status)=>{
- let alasan=prompt('Masukkan alasan:');
+ let alasan=prompt('Alasan:');
  await updateDoc(doc(db,'tawaran',id),{status,alasan});
 }
 
