@@ -6,12 +6,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500&display=swap" rel="stylesheet">
 <style>
 body{margin:0;background:#0b1320;color:white;font-family:Teko}
-header{background:#111c33;padding:15px;display:flex;justify-content:space-between;align-items:center}
+header{
+ background:#111c33;
+ padding:15px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ position:relative;
+ z-index:1000;
+}
 .menu{font-size:28px;cursor:pointer}
 .card{background:#162447;padding:20px;margin:20px;border-radius:12px}
 input,select,button{width:100%;padding:10px;margin:6px 0;border-radius:6px;border:none}
 button{background:#1f6cff;color:white;font-size:18px;cursor:pointer}
-#panel{display:none;position:fixed;top:65px;right:10px;background:#111c33;padding:15px;border-radius:10px;width:200px}
+#panel{
+ display:none;
+ position:fixed;
+ top:65px;
+ right:10px;
+ background:#111c33;
+ padding:15px;
+ border-radius:10px;
+ width:200px;
+ z-index:999;
+}
 small{color:#ccc}
 </style>
 </head>
@@ -37,8 +55,10 @@ small{color:#ccc}
 <option>Milan</option>
 </select>
 <input id="pass" type="password" placeholder="Password Club">
-<button onclick="login()">Masuk</button>
-<p id="info" style="display:none;font-weight:bold">Tekan pojok kanan atas untuk memulai ☰</p>
+<button id="btnLogin" onclick="login()">Masuk</button>
+<p id="info" style="display:none;font-weight:bold">
+Tekan pojok kanan atas untuk memulai ☰
+</p>
 </section>
 
 <section id="beli" class="card" style="display:none">
@@ -60,7 +80,7 @@ small{color:#ccc}
 <script type="module">
 import { db } from './firebase.js';
 import {
-  collection, addDoc, query, where, onSnapshot
+ collection, addDoc, query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const pw={
@@ -73,7 +93,7 @@ const pw={
 let clubAktif='';
 
 window.toggleMenu=()=>{
- panel.style.display=panel.style.display==='block'?'none':'block';
+ panel.style.display = panel.style.display==='block'?'none':'block';
 }
 
 window.login=()=>{
@@ -81,14 +101,17 @@ window.login=()=>{
  if(pass.value!==pw[club.value]) return alert('Password salah');
 
  clubAktif=club.value;
- club.style.display=pass.style.display='none';
- event.target.style.display='none';
+
+ club.style.display='none';
+ pass.style.display='none';
+ btnLogin.style.display='none';
  info.style.display='block';
 }
 
 window.show=(id)=>{
  document.querySelectorAll('section').forEach(s=>s.style.display='none');
  document.getElementById(id).style.display='block';
+ panel.style.display='none';
 }
 
 window.kirim=async()=>{
@@ -111,6 +134,22 @@ onSnapshot(
  query(collection(db,'tawaran'),where('dari','==',clubAktif)),
  snap=>{
   hasilList.innerHTML='';
+  snap.forEach(d=>{
+   let x=d.data();
+   hasilList.innerHTML+=`
+   <div class="card">
+    <b>${x.nama}</b><br>
+    Harga: ${x.harga}<br>
+    Status: ${x.status}<br>
+    <small>${x.alasan||''}</small>
+   </div>`;
+  })
+ }
+);
+</script>
+
+</body>
+</html>  hasilList.innerHTML='';
   snap.forEach(d=>{
    let x=d.data();
    hasilList.innerHTML+=`
