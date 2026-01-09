@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Transfer Market Liga</title>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0b1320;color:white;font-family:Teko}
+header{background:#111c33;padding:15px;display:flex;justify-content:space-between;align-items:center}
+.menu{font-size:28px;cursor:pointer}
+.card{background:#162447;padding:20px;margin:20px;border-radius:12px}
+input,select,button{width:100%;padding:10px;margin:6px 0;border-radius:6px;border:none}
+button{background:#1f6cff;color:white;font-size:18px;cursor:pointer}
+#panel{display:none;position:fixed;top:65px;right:10px;background:#111c33;padding:15px;border-radius:10px;width:200px}
+small{color:#ccc}
+</style>
+</head>
+<body>
+
+<header>
+<h2>⚽ Transfer Market</h2>
+<div class="menu" onclick="toggleMenu()">☰</div>
+</header>
+
+<div id="panel">
+<button onclick="show('beli')">Beli Pemain</button>
+<button onclick="show('hasil')">Lihat Hasil</button>
+</div>
+
+<section id="login" class="card">
+<h3>Login Club</h3>
+<select id="club">
+<option value="">-- Pilih Club --</option>
+<option>Barcelona</option>
+<option>Chelsea</option>
+<option>Leverkusen</option>
+<option>Milan</option>
+</select>
+<input id="pass" type="password" placeholder="Password Club">
+<button onclick="login()">Masuk</button>
+<p id="info" style="display:none;font-weight:bold">Tekan pojok kanan atas untuk memulai ☰</p>
+</section>
+
+<section id="beli" class="card" style="display:none">
+<h3>Beli Pemain</h3>
+<input id="nama" placeholder="Nama Pemain *">
+<input id="umur" placeholder="Umur">
+<input id="negara" placeholder="Negara">
+<input id="clubasal" placeholder="Club Asal">
+<input id="posisi" placeholder="Posisi">
+<input id="harga" placeholder="Harga Tawaran">
+<button onclick="kirim()">Kirim Tawaran</button>
+</section>
+
+<section id="hasil" class="card" style="display:none">
+<h3>Hasil Tawaran</h3>
+<div id="hasilList"></div>
+</section>
+
+<script type="module">
+import { db } from './firebase.js';
+import {
+  collection, addDoc, query, where, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const pw={
+ Barcelona:'Barca123',
+ Chelsea:'Chelsea123',
+ Leverkusen:'Leverkusen123',
+ Milan:'Milan123'
+};
+
+let clubAktif='';
+
+window.toggleMenu=()=>{
+ panel.style.display=panel.style.display==='block'?'none':'block';
+}
+
+window.login=()=>{
+ if(!club.value) return alert('Pilih club');
+ if(pass.value!==pw[club.value]) return alert('Password salah');
+
+ clubAktif=club.value;
+ club.style.display=pass.style.display='none';
+ event.target.style.display='none';
+ info.style.display='block';
+}
+
+window.show=(id)=>{
+ document.querySelectorAll('section').forEach(s=>s.style.display='none');
+ document.getElementById(id).style.display='block';
+}
+
+window.kirim=async()=>{
+ if(!nama.value) return alert('Nama pemain wajib');
+ await addDoc(collection(db,'tawaran'),{
+  dari:clubAktif,
+  nama:nama.value,
+  umur:umur.value,
+  negara:negara.value,
+  clubasal:clubasal.value,
+  posisi:posisi.value,
+  harga:harga.value,
+  status:'Menunggu',
+  waktu:Date.now()
+ });
+ alert('Tawaran dikirim');
+}
+
+onSnapshot(
+ query(collection(db,'tawaran'),where('dari','==',clubAktif)),
+ snap=>{
+  hasilList.innerHTML='';
+  snap.forEach(d=>{
+   let x=d.data();
+   hasilList.innerHTML+=`
+   <div class="card">
+    <b>${x.nama}</b><br>
+    Harga: ${x.harga}<br>
+    Status: ${x.status}<br>
+    <small>${x.alasan||''}</small>
+   </div>`;
+  })
+ }
+);
+</script>
+
+</body>
+  </html>
