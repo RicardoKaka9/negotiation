@@ -149,6 +149,45 @@ onSnapshot(
 </script>
 
 </body>
+</html> document.getElementById(id).style.display='block';
+ panel.style.display='none';
+}
+
+window.kirim=async()=>{
+ if(!nama.value) return alert('Nama pemain wajib');
+ await addDoc(collection(db,'tawaran'),{
+  dari:clubAktif,
+  nama:nama.value,
+  umur:umur.value,
+  negara:negara.value,
+  clubasal:clubasal.value,
+  posisi:posisi.value,
+  harga:harga.value,
+  status:'Menunggu',
+  waktu:Date.now()
+ });
+ alert('Tawaran dikirim');
+}
+
+onSnapshot(
+ query(collection(db,'tawaran'),where('dari','==',clubAktif)),
+ snap=>{
+  hasilList.innerHTML='';
+  snap.forEach(d=>{
+   let x=d.data();
+   hasilList.innerHTML+=`
+   <div class="card">
+    <b>${x.nama}</b><br>
+    Harga: ${x.harga}<br>
+    Status: ${x.status}<br>
+    <small>${x.alasan||''}</small>
+   </div>`;
+  })
+ }
+);
+</script>
+
+</body>
 </html>  hasilList.innerHTML='';
   snap.forEach(d=>{
    let x=d.data();
