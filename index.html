@@ -22,13 +22,9 @@ body{
   padding:14px 18px;
   background:#020617;
 }
+.logo{font-weight:bold;letter-spacing:2px}
 
-.logo{
-  font-weight:bold;
-  letter-spacing:2px;
-}
-
-/* MENU BUTTON */
+/* MENU BTN */
 .menu-btn{
   font-size:26px;
   cursor:pointer;
@@ -36,10 +32,7 @@ body{
   visibility:hidden;
   transition:.3s;
 }
-.menu-btn.show{
-  opacity:1;
-  visibility:visible;
-}
+.menu-btn.show{opacity:1;visibility:visible}
 
 /* SIDE MENU */
 .side-menu{
@@ -53,7 +46,6 @@ body{
   transition:.3s;
   z-index:999;
 }
-
 .side-menu button{
   width:100%;
   background:none;
@@ -64,48 +56,33 @@ body{
   font-size:16px;
   cursor:pointer;
 }
-.side-menu button:hover{
-  background:#1e293b;
-}
+.side-menu button:hover{background:#1e293b}
 
-/* LOGIN BOX */
-.login-box{
-  max-width:340px;
-  margin:90px auto;
+/* CONTENT */
+.content{
+  max-width:400px;
+  margin:40px auto;
   background:#020617;
-  padding:22px;
+  padding:20px;
   border-radius:10px;
 }
 
-.login-box h3{
-  margin-top:0;
-  text-align:center;
-}
-
-select,input,button{
+input,select,button{
   width:100%;
-  padding:12px;
-  margin-top:12px;
+  padding:10px;
+  margin-top:10px;
   border:none;
   border-radius:6px;
-  font-size:15px;
 }
 
-button{
+button.primary{
   background:#2563eb;
   color:white;
   font-weight:bold;
-  cursor:pointer;
 }
 
 .hidden{display:none}
-
-.center-text{
-  text-align:center;
-  margin-top:80px;
-  opacity:.8;
-  font-size:16px;
-}
+.center-text{text-align:center;margin-top:70px;opacity:.8}
 </style>
 </head>
 
@@ -119,16 +96,15 @@ button{
 
 <!-- SIDE MENU -->
 <div class="side-menu" id="sideMenu">
-  <button>Beli Pemain</button>
-  <button>Lihat Tawaran</button>
-  <button>Lihat Hasil</button>
+  <button onclick="showPage('buy')">Beli Pemain</button>
+  <button onclick="showPage('sent')">Lihat Tawaran</button>
+  <button onclick="showPage('incoming')">Tawaran Masuk</button>
   <button onclick="logout()">Logout</button>
 </div>
 
 <!-- LOGIN -->
-<div class="login-box" id="loginBox">
+<div class="content" id="loginBox">
   <h3>Login Club</h3>
-
   <select id="club">
     <option value="">Pilih Club</option>
     <option>Barcelona</option>
@@ -136,18 +112,44 @@ button{
     <option>Leverkusen</option>
     <option>Milan</option>
   </select>
-
   <input type="password" id="password" placeholder="Password Club">
-  <button onclick="login()">Masuk</button>
+  <button class="primary" onclick="login()">Masuk</button>
 </div>
 
-<!-- AFTER LOGIN -->
+<!-- INFO -->
 <div class="center-text hidden" id="afterLogin">
   Tekan pojok kanan atas untuk memulai
 </div>
 
+<!-- BELI PEMAIN -->
+<div class="content hidden" id="buy">
+  <h3>Beli Pemain</h3>
+  <input placeholder="Nama Pemain (Wajib)">
+  <input placeholder="Negara">
+  <input type="number" placeholder="Umur">
+  <input placeholder="Posisi">
+  <input type="number" placeholder="Harga (€)">
+  <button class="primary" onclick="sendOffer()">Kirim Tawaran</button>
+</div>
+
+<!-- TAWARAN TERKIRIM -->
+<div class="content hidden" id="sent">
+  <h3>Tawaran Terkirim</h3>
+  <div id="sentList">Belum ada tawaran.</div>
+</div>
+
+<!-- TAWARAN MASUK -->
+<div class="content hidden" id="incoming">
+  <h3>Tawaran Masuk</h3>
+  <div class="offer">
+    <p><b>Real Madrid</b> menawar <b>Arkha</b></p>
+    <button onclick="alert('Tawaran diterima')">Terima</button>
+    <button onclick="counter()">Tawar</button>
+    <button onclick="alert('Tawaran ditolak')">Tolak</button>
+  </div>
+</div>
+
 <script>
-/* PASSWORD CLUB */
 const passwords={
   Barcelona:"Barca123",
   Chelsea:"Chelsea123",
@@ -155,44 +157,47 @@ const passwords={
   Milan:"Milan123"
 };
 
-/* LOGIN */
 function login(){
   const club=document.getElementById("club").value;
   const pass=document.getElementById("password").value;
-
-  if(!club||!pass){
-    alert("Lengkapi data!");
-    return;
-  }
-  if(passwords[club]!==pass){
-    alert("Password salah!");
-    return;
-  }
-
+  if(passwords[club]!==pass){alert("Login gagal");return;}
   localStorage.setItem("club",club);
-
   document.getElementById("loginBox").classList.add("hidden");
   document.getElementById("afterLogin").classList.remove("hidden");
   document.getElementById("menuBtn").classList.add("show");
 }
 
-/* MENU TOGGLE */
-document.getElementById("menuBtn").addEventListener("click",()=>{
-  const menu=document.getElementById("sideMenu");
-  menu.style.right = menu.style.right==="0px" ? "-240px" : "0px";
-});
+function showPage(id){
+  document.querySelectorAll(".content").forEach(c=>c.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  toggleMenu();
+}
 
-/* LOGOUT */
+function sendOffer(){
+  document.getElementById("sentList").innerHTML+="<p>Tawaran dikirim</p>";
+  alert("Tawaran terkirim!");
+}
+
+function counter(){
+  const harga=prompt("Masukkan harga counter:");
+  if(harga) alert("Counter offer €"+harga+" dikirim");
+}
+
+function toggleMenu(){
+  const m=document.getElementById("sideMenu");
+  m.style.right=m.style.right==="0px"?"-240px":"0px";
+}
+menuBtn.onclick=toggleMenu;
+
 function logout(){
   localStorage.clear();
   location.reload();
 }
 
-/* AUTO LOGIN */
 if(localStorage.getItem("club")){
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("afterLogin").classList.remove("hidden");
-  document.getElementById("menuBtn").classList.add("show");
+  loginBox.classList.add("hidden");
+  afterLogin.classList.remove("hidden");
+  menuBtn.classList.add("show");
 }
 </script>
 
