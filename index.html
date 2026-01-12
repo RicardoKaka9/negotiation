@@ -83,6 +83,22 @@ button.primary{
 
 .hidden{display:none}
 .center-text{text-align:center;margin-top:70px;opacity:.8}
+.small-text{font-size:13px;opacity:.7;margin-top:8px}
+
+.offer-box{
+  background:#020617;
+  padding:14px;
+  border-radius:8px;
+  margin-top:10px;
+}
+.offer-box button{
+  margin-top:8px;
+}
+.status-text{
+  margin-top:10px;
+  font-style:italic;
+  opacity:.8;
+}
 </style>
 </head>
 
@@ -116,7 +132,6 @@ button.primary{
   <button class="primary" onclick="login()">Masuk</button>
 </div>
 
-<!-- INFO -->
 <div class="center-text hidden" id="afterLogin">
   Tekan pojok kanan atas untuk memulai
 </div>
@@ -124,12 +139,15 @@ button.primary{
 <!-- BELI PEMAIN -->
 <div class="content hidden" id="buy">
   <h3>Beli Pemain</h3>
-  <input placeholder="Nama Pemain (Wajib)">
-  <input placeholder="Negara">
-  <input type="number" placeholder="Umur">
-  <input placeholder="Posisi">
-  <input type="number" placeholder="Harga (€)">
+  <input id="pname" placeholder="Nama Pemain (Wajib)">
+  <input id="pcountry" placeholder="Negara">
+  <input id="page" type="number" placeholder="Umur">
+  <input id="ppos" placeholder="Posisi">
+  <input id="pprice" type="number" placeholder="Harga (€)">
   <button class="primary" onclick="sendOffer()">Kirim Tawaran</button>
+  <div id="offerMsg" class="small-text hidden">
+    Tawaranmu berhasil di terkirim, tunggu balasan
+  </div>
 </div>
 
 <!-- TAWARAN TERKIRIM -->
@@ -141,12 +159,14 @@ button.primary{
 <!-- TAWARAN MASUK -->
 <div class="content hidden" id="incoming">
   <h3>Tawaran Masuk</h3>
-  <div class="offer">
+
+  <div class="offer-box" id="incomingOffer">
     <p><b>Real Madrid</b> menawar <b>Arkha</b></p>
-    <button onclick="alert('Tawaran diterima')">Terima</button>
-    <button onclick="counter()">Tawar</button>
-    <button onclick="alert('Tawaran ditolak')">Tolak</button>
+    <button onclick="acceptOffer()">Terima</button>
+    <button onclick="counterOffer()">Tawar</button>
+    <button onclick="rejectOffer()">Tolak</button>
   </div>
+
 </div>
 
 <script>
@@ -162,9 +182,9 @@ function login(){
   const pass=document.getElementById("password").value;
   if(passwords[club]!==pass){alert("Login gagal");return;}
   localStorage.setItem("club",club);
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("afterLogin").classList.remove("hidden");
-  document.getElementById("menuBtn").classList.add("show");
+  loginBox.classList.add("hidden");
+  afterLogin.classList.remove("hidden");
+  menuBtn.classList.add("show");
 }
 
 function showPage(id){
@@ -173,19 +193,43 @@ function showPage(id){
   toggleMenu();
 }
 
+/* KIRIM TAWARAN */
 function sendOffer(){
-  document.getElementById("sentList").innerHTML+="<p>Tawaran dikirim</p>";
-  alert("Tawaran terkirim!");
+  if(!pname.value){alert("Nama pemain wajib");return;}
+
+  sentList.innerHTML += `<p>Menawar <b>${pname.value}</b></p>`;
+
+  pname.value="";
+  pcountry.value="";
+  page.value="";
+  ppos.value="";
+  pprice.value="";
+
+  offerMsg.classList.remove("hidden");
 }
 
-function counter(){
-  const harga=prompt("Masukkan harga counter:");
-  if(harga) alert("Counter offer €"+harga+" dikirim");
+/* TAWARAN MASUK */
+function acceptOffer(){
+  incomingOffer.innerHTML =
+    `<div class="status-text">Tawaran ini anda Terima</div>`;
 }
 
+function rejectOffer(){
+  incomingOffer.innerHTML =
+    `<div class="status-text">Tawaran ini anda Tolak</div>`;
+}
+
+function counterOffer(){
+  const harga=prompt("Masukkan harga tawaran:");
+  if(!harga)return;
+  incomingOffer.innerHTML =
+    `<div class="status-text">Tawaran ini anda Tawar (€${harga})</div>`;
+}
+
+/* MENU */
 function toggleMenu(){
-  const m=document.getElementById("sideMenu");
-  m.style.right=m.style.right==="0px"?"-240px":"0px";
+  sideMenu.style.right =
+    sideMenu.style.right==="0px"?"-240px":"0px";
 }
 menuBtn.onclick=toggleMenu;
 
