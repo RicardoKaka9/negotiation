@@ -2,62 +2,126 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Admin Transfer</title>
-<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500&display=swap" rel="stylesheet">
+<title>Admin Panel - Negotiation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body{background:#0b1320;color:white;font-family:Teko;margin:0}
-header{background:#111c33;padding:15px}
-.card{background:#162447;margin:15px;padding:15px;border-radius:12px}
-button{margin:5px;padding:8px 12px;border:none;border-radius:6px;cursor:pointer}
-.acc{background:#28a745;color:white}
-.neg{background:#dc3545;color:white}
-.twr{background:#ffc107;color:black}
-</style>
-</head>
-<body>
-
-<header>
-<h2>🛠 Admin Transfer Market</h2>
-</header>
-
-<div id="list"></div>
-
-<script type="module">
-import { db } from './firebase.js';
-import {
- collection,onSnapshot,doc,updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-onSnapshot(collection(db,'tawaran'),snap=>{
- list.innerHTML='';
- snap.forEach(d=>{
-  let x=d.data();
-  list.innerHTML+=`
-  <div class="card">
-   <b>${x.nama}</b> (${x.dari})<br>
-   Posisi: ${x.posisi}<br>
-   Harga: ${x.harga}<br>
-   Status: ${x.status}<br><br>
-   <button class="acc" onclick="aksi('${d.id}','Diterima')">Terima</button>
-   <button class="twr" onclick="tawar('${d.id}')">Tawar</button>
-   <button class="neg" onclick="aksi('${d.id}','Ditolak')">Tolak</button>
-  </div>`;
- })
-});
-
-window.aksi=async(id,status)=>{
- let alasan=prompt('Alasan:');
- await updateDoc(doc(db,'tawaran',id),{status,alasan});
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:linear-gradient(180deg,#020617,#0f172a);
+  color:white;
 }
 
-window.tawar=async(id)=>{
- let harga=prompt('Harga baru:');
- let bonus=prompt('Bonus (opsional):');
- await updateDoc(doc(db,'tawaran',id),{
-  status:'Ditawar',
-  harga:harga,
-  bonus:bonus
- });
+/* HEADER */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  background:#020617;
+}
+.logo{font-weight:bold;letter-spacing:2px}
+
+/* CONTENT */
+.container{
+  max-width:420px;
+  margin:30px auto;
+  background:#020617;
+  padding:20px;
+  border-radius:12px;
+}
+
+h3{margin-top:0}
+
+.offer{
+  background:#0f172a;
+  padding:14px;
+  border-radius:10px;
+  margin-top:14px;
+}
+
+.offer small{
+  opacity:.7;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.accept{background:#16a34a;color:white}
+.reject{background:#dc2626;color:white}
+.counter{background:#2563eb;color:white}
+
+.status{
+  margin-top:10px;
+  font-style:italic;
+  opacity:.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="logo">ADMIN PANEL</div>
+</div>
+
+<div class="container">
+  <h3>Tawaran Masuk</h3>
+
+  <!-- TAWARAN BELI -->
+  <div class="offer" id="offer1">
+    <b>Barcelona</b> menawar pemain <b>Arkha</b><br>
+    <small>Posisi: CAM | Umur: 19 | Harga: €40jt</small>
+
+    <button class="accept" onclick="accept('offer1')">Terima</button>
+    <button class="counter" onclick="counter('offer1')">Tawar</button>
+    <button class="reject" onclick="reject('offer1')">Tolak</button>
+  </div>
+
+  <!-- TAWARAN JUAL -->
+  <div class="offer" id="offer2">
+    <b>Chelsea</b> menawarkan pemain <b>Davins</b><br>
+    <small>Posisi: CB | Umur: 22 | Harga: €30jt</small>
+
+    <button class="accept" onclick="accept('offer2')">Terima</button>
+    <button class="counter" onclick="counter('offer2')">Tawar</button>
+    <button class="reject" onclick="reject('offer2')">Tolak</button>
+  </div>
+
+</div>
+
+<script>
+function accept(id){
+  document.getElementById(id).innerHTML =
+    `<div class="status">Tawaran ini anda <b>Terima</b></div>`;
+}
+
+function reject(id){
+  document.getElementById(id).innerHTML =
+    `<div class="status">Tawaran ini anda <b>Tolak</b></div>`;
+}
+
+function counter(id){
+  const harga = prompt("Masukkan harga tawaran:");
+  if(!harga) return;
+
+  const bonus = prompt("Bonus (opsional):");
+
+  document.getElementById(id).innerHTML =
+    `<div class="status">
+      Tawaran ini anda <b>Tawar</b><br>
+      Harga: €${harga}<br>
+      ${bonus ? "Bonus: "+bonus : ""}
+    </div>`;
 }
 </script>
 
